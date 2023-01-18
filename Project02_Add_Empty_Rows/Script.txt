@@ -1,0 +1,74 @@
+Option Explicit
+Sub Insert_Zero_Rows()
+
+    Dim First_row As Long
+    Dim First_Col As Long
+    Dim Last_row As Long
+    Dim Last_Col As Long
+    
+    Dim activeWB As Workbook
+    Dim activeWS As Worksheet
+    Dim OutputSH As Worksheet
+    
+    Dim Ran11 As Range
+    Set Ran11 = Selection
+    
+    Dim Diff_row As Long
+    Dim Diff_col As Long
+    Dim Output_Start_row As Long
+    Dim Output_Start_Col As Long
+    Dim i As Integer
+    Dim j As Integer
+    Dim No_of_Zero_Row As Long
+    Dim Curr_Output_row As Long
+    'MsgBox CStr(Ran11.Rows.Count)
+    Application.ScreenUpdating = False
+
+    First_row = Ran11.Cells(1, 1).Row
+    First_Col = Ran11.Cells(1, 1).Column
+    
+    Last_row = Ran11.Cells(Ran11.Rows.Count, 1).Row
+    Last_Col = Ran11.Cells(Ran11.Rows.Count, Ran11.Columns.Count).Column
+    
+    No_of_Zero_Row = Ran11.Rows.Count - 1
+''''''add new sheet into activeworkbook,
+    Set activeWB = Application.ActiveWorkbook
+    Set activeWS = activeWB.ActiveSheet
+    
+    
+    Set OutputSH = activeWB.Worksheets.Add(After:=activeWS)
+    OutputSH.Name = "Output_Sheet" & "_" & CStr(Replace(Date, "/", "")) & "_" & CStr(Mid(Replace(Time, ":", ""), 1, 5))
+    Output_Start_row = 2
+    Output_Start_Col = 1
+    
+''''''Copying data into output sheet and inserting 0 rows at alternate sequence.
+    Diff_row = First_row - Output_Start_row
+    Diff_col = First_Col - Output_Start_Col
+   
+    Curr_Output_row = First_row - Diff_row
+    
+    For i = First_row To (Last_row)
+              
+          For j = First_Col To Last_Col
+                
+                OutputSH.Cells(Curr_Output_row, j - Diff_col) = activeWS.Cells(i, j)
+                             
+          Next j
+           
+          ''''''''inserting Zero row
+          If (i <> Last_row) Then
+                Curr_Output_row = Curr_Output_row + 1
+                For j = First_Col To Last_Col
+                      
+                      OutputSH.Cells(Curr_Output_row, j - Diff_col) = 0
+                      
+                Next j
+                
+                Curr_Output_row = Curr_Output_row + 1
+          End If
+          
+    Next i
+        
+     OutputSH.Range(OutputSH.Cells(2, 1), OutputSH.Cells(OutputSH.Cells(2, 1).End(xlDown).Row, Ran11.Columns.Count)).Interior.Color = Ran11.Interior.Color
+    
+End Sub
